@@ -1,41 +1,56 @@
+import os
 from RegimeMap.pipeline import build_surface
 
 
 def main():
     """
     Точка входа библиотечного режима.
-    Здесь можно менять входные данные, разрешение RBF-сетки и параметры фильтрации.
+    Теперь: входная папка → выходная папка.
+    Для каждого CSV в папке создается файл:
+        approx_<исходное_имя>.csv
     """
 
     # === Настройки пользователя ===
-    input_csv = "data/source/diesel_steam_O2.csv"          # путь к исходным данным
-    output_csv = "data/result/approx_diesel_steam_O2.csv"   # куда сохранить аппроксимированную поверхность
+    input_dir = "data/source/"      # папка с входными CSV
+    output_dir = "data/result/"     # папка для сохранения результатов
 
-    resolution = (100, 100)          # размер сетки (например 50x50, 200x200)
-    median_size = 20                  # медианная фильтрация (None или 0 — отключить)
-    clamp_zero = True                # удалять отрицательные значения
-    kernel = "linear"                # ядро RBF: linear, multiquadric, cubic, gaussian …
+    resolution = (100, 100)
+    median_size = 20
+    clamp_zero = True
+    kernel = "linear"
 
-    print("=== RegimeMap Surface Builder ===")
-    print(f"Input CSV:   {input_csv}")
-    print(f"Output CSV:  {output_csv}")
-    print(f"Resolution:  {resolution}")
-    print(f"Median:      {median_size}")
-    print(f"Clamp zero:  {clamp_zero}")
-    print(f"Kernel:      {kernel}")
-    print("Processing...")
+    print("=== RegimeMap Surface Builder (Batch Mode) ===")
+    print(f"Input folder:   {input_dir}")
+    print(f"Output folder:  {output_dir}")
+    print("Processing...\n")
 
-    # запуск конвейера
-    fuel_axis, additive_axis, surface = build_surface(
-        input_csv=input_csv,
-        output_csv=output_csv,
-        resolution=resolution,
-        median_size=median_size,
-        clamp_zero=clamp_zero,
-        kernel=kernel
-    )
+    # Создаём выходную папку, если её нет
+    os.makedirs(output_dir, exist_ok=True)
 
-    print("Done! Surface saved to:", output_csv)
+    # Перебираем все CSV в папке
+    for filename in os.listdir(input_dir):
+        if not filename.lower().endswith(".csv"):
+            continue
+
+        input_csv = os.path.join(input_dir, filename)
+        output_csv = os.path.join(output_dir, "approx_" + filename)
+
+        print(f"→ Processing file: {filename}")
+
+        try:
+            fuel_axis, additive_axis, surface = build_surface(
+                input_csv=input_csv,
+                output_csv=output_csv,
+                resolution=resolution,
+                median_size=median_size,
+                clamp_zero=clamp_zero,
+                kernel=kernel,
+            )
+            print(f"   Saved: {output_csv}")
+        except Exception as e:
+            print(f"   ERROR processing {filename}: {e}")
+
+    print("\nDone! All surfaces saved to:", output_dir)
 
 
 if __name__ == "__main__":
