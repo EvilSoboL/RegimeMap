@@ -31,7 +31,7 @@ def test_build_surface_visualization():
             input_csv=input_path,
             output_csv=output_path,
             resolution=(100, 100),
-            median_size=5,
+            median_size=20,
             clamp_zero=True,
             kernel="linear"
         )
@@ -85,24 +85,26 @@ def test_build_surface_visualization():
 
         # 2. RBF аппроксимированная поверхность
         ax2 = fig.add_subplot(122)
-        im = ax2.imshow(
+        sns.heatmap(
             surface,
             cmap='viridis',
-            aspect='auto',
-            origin='lower',
-            extent=[f_axis.min(), f_axis.max(), a_axis.min(), a_axis.max()],
-            interpolation='bilinear'
+            ax=ax2,
+            cbar_kws={'label': 'Component'},
+            xticklabels=False,
+            yticklabels=False
         )
-        ax2.set_xlabel('Fuel', fontsize=12, fontweight='bold')
-        ax2.set_ylabel('Additive', fontsize=12, fontweight='bold')
+        ax2.set_xlabel('Fuel →', fontsize=12, fontweight='bold')
+        ax2.set_ylabel('Additive →', fontsize=12, fontweight='bold')
         ax2.set_title(f'RBF поверхность\n({surface.shape[1]}x{surface.shape[0]} точек)',
                       fontsize=14, fontweight='bold')
-        cbar2 = plt.colorbar(im, ax=ax2, label='Component')
 
-        # Накладываем исходные точки на RBF поверхность
+        # Накладываем исходные точки (нужно пересчитать координаты для heatmap)
+        fuel_indices = np.interp(original_df['fuel'], f_axis, np.arange(len(f_axis)))
+        additive_indices = np.interp(original_df['additive'], a_axis, np.arange(len(a_axis)))
+
         ax2.scatter(
-            original_df['fuel'],
-            original_df['additive'],
+            fuel_indices,
+            additive_indices,
             c='red',
             s=30,
             edgecolors='white',
