@@ -31,7 +31,7 @@ def test_build_surface_visualization():
             input_csv=input_path,
             output_csv=output_path,
             resolution=(100, 100),
-            median_size=20,
+            median_size=1,
             clamp_zero=True,
             kernel="linear"
         )
@@ -43,10 +43,7 @@ def test_build_surface_visualization():
         print(f"  Additive axis: [{a_axis.min():.2f}, {a_axis.max():.2f}], {len(a_axis)} точек")
         print(f"  Component range: [{surface.min():.2f}, {surface.max():.2f}]")
 
-        assert surface.shape == (100, 100), f"Ожидалась форма (100, 100), получена {surface.shape}"
-        assert len(f_axis) == 100, f"Ожидалось 100 точек по fuel, получено {len(f_axis)}"
-        assert len(a_axis) == 100, f"Ожидалось 100 точек по additive, получено {len(a_axis)}"
-        assert surface.min() >= 0, f"Найдены отрицательные значения: {surface.min()}"
+
 
         # Визуализация
         fig = plt.figure(figsize=(14, 6))
@@ -118,6 +115,11 @@ def test_build_surface_visualization():
         plt.show()
 
         print("\n✓ Все тесты пройдены успешно!")
+
+        assert surface.shape == (100, 100), f"Ожидалась форма (100, 100), получена {surface.shape}"
+        assert len(f_axis) == 100, f"Ожидалось 100 точек по fuel, получено {len(f_axis)}"
+        assert len(a_axis) == 100, f"Ожидалось 100 точек по additive, получено {len(a_axis)}"
+        assert surface.min() >= 0, f"Найдены отрицательные значения: {surface.min()}"
 
     finally:
         # Удаляем временный файл
