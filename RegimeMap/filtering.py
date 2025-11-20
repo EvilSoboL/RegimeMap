@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.ndimage import median_filter
 
-def apply_filters(surface, median_size=7, clamp_zero=True):
+def apply_filters(surface, median_size=20, clamp_zero=True):
     if clamp_zero:
         surface = np.where(surface < 0, 0, surface)
 
