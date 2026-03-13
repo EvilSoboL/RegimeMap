@@ -11,8 +11,8 @@ def main():
     """
 
     # === Настройки пользователя ===
-    input_dir = "data/source/"      # папка с входными CSV
-    output_dir = "data/result/"     # папка для сохранения результатов
+    input_dir = "data/13_03_2026"      # папка с входными CSV
+    output_dir = "result/13_03_2026"     # папка для сохранения результатов
 
     resolution = (100, 100)
     median_size = 20
